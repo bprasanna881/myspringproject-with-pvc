@@ -16,15 +16,16 @@ spec:
         - name: my-springboot-app
           image: myspring.azurecr.io/bprasanna881/myspringproject:#{Build.BuildId}#
           imagePullPolicy: Always
+          ports:
+          - containerPort: 8085
           volumeMounts:
             - mountPath: /test-pd
               name: test-volume
-    volumes:
+      volumes:
       - name: test-volume
         persistentVolumeClaim:
           claimName: azure-managed-disk
-          ports:
-            - containerPort: 8085
+      
 # service type loadbalancer
 ---
 apiVersion: v1
