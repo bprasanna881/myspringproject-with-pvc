@@ -16,6 +16,13 @@ spec:
       - name: my-springboot-app
         image: myspring.azurecr.io/bprasanna881/myspringproject:#{Build.BuildId}#
         imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /test-pd 
+          name: test-volume
+    volumes:
+    - name: test-volume
+      persistentVolumeClaim:
+        claimName: azure-managed-disk    
         ports:
         - containerPort: 8085
 # service type loadbalancer       
@@ -36,3 +43,26 @@ spec:
   type: LoadBalancer
   selector:
     app: springboot-app
+    
+---
+#pvc provisioning
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: slow
+  resources:
+    requests:
+      storage: 5Gi
+---
+#Storage Class
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: slow
+provisioner: kubernetes.io/azure-disk
+parameters:
+  skuName: Standard_LRS
